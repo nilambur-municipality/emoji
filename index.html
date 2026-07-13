@@ -287,7 +287,7 @@ async function convert(){
 Message: "${input}"
 
 Do TWO things:
-1. "malayalam": Convert the message into proper Malayalam script (if it is Manglish, transliterate/translate it into natural Malayalam script; if already Malayalam script keep as is; if it is genuinely English content with no Malayalam intent, keep it in English).
+1. "malayalam": First detect the language of the message. If it is Manglish (Malayalam words/sentences typed using English/Latin letters, e.g. "nale varunnilla"), convert it into proper Malayalam script (e.g. "നാളെ വരുന്നില്ല"). If it is already written in Malayalam script, keep it exactly as is. If the message is genuinely in English (real English words/sentences, not Malayalam typed in English letters), keep it in English exactly as written — do NOT translate English into Malayalam.
 2. "emoji": ${densityInstruction}
 
 Rules:
@@ -427,7 +427,7 @@ Conversation lines:
 ${linesForPrompt}
 
 For EACH numbered line, do TWO things:
-1. "text": Convert the message into proper Malayalam script (if it is Manglish, transliterate/translate it into natural Malayalam script; if it is already Malayalam script keep it as is; if it is genuinely English content with no Malayalam intent, keep it in English).
+1. "text": First detect the language of this line. If it is Manglish (Malayalam words/sentences typed using English/Latin letters, e.g. "nale varunnilla"), convert it into proper Malayalam script (e.g. "നാളെ വരുന്നില്ല"). If it is already written in Malayalam script, keep it exactly as is. If the line is genuinely in English (real English words/sentences, not Malayalam typed in English letters), keep it in English exactly as written — do NOT translate English into Malayalam.
 2. "mood": pick exactly ONE face/expression emoji (like 😊 😠 😢 😴 😲 😍 😅 🥳 🤔 😐 etc) that best matches the speaker's facial expression for THIS specific line. This will be used as the speaker's avatar face for this line, so vary it line by line based on the mood of that line.
 
 For "speaker": if a speaker name was given, use it exactly as given. If speaker is "(no name given)", output "speaker" as an empty string "".
