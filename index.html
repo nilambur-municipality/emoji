@@ -81,8 +81,8 @@
   }
   .comic-panel.right{ flex-direction:row-reverse; }
   .avatar{
-    width:44px; height:44px; border-radius:50%; background:#fff; border:2px solid #2b2b2b;
-    display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;
+    width:54px; height:54px; border-radius:50%; background:#fff; border:2px solid #2b2b2b;
+    display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0;
   }
   .bubble-wrap{ max-width:75%; }
   .speaker-name{
@@ -426,15 +426,14 @@ async function convertComic(){
 Conversation lines:
 ${linesForPrompt}
 
-For EACH numbered line, do THREE things:
+For EACH numbered line, do TWO things:
 1. "text": Convert the message into proper Malayalam script (if it is Manglish, transliterate/translate it into natural Malayalam script; if it is already Malayalam script keep it as is; if it is genuinely English content with no Malayalam intent, keep it in English).
-2. "emoji": produce a short emoji sequence (2-5 emojis) that expresses that specific line's meaning/mood, like a comic character's expression, to show inside the speech bubble.
-3. "mood": pick exactly ONE face/expression emoji (like 😊 😠 😢 😴 😲 😍 😅 🥳 🤔 😐 etc) that best matches the speaker's facial expression for THIS specific line. This will be used as the speaker's avatar face for this line, so vary it line by line based on the mood of that line.
+2. "mood": pick exactly ONE face/expression emoji (like 😊 😠 😢 😴 😲 😍 😅 🥳 🤔 😐 etc) that best matches the speaker's facial expression for THIS specific line. This will be used as the speaker's avatar face for this line, so vary it line by line based on the mood of that line.
 
 For "speaker": if a speaker name was given, use it exactly as given. If speaker is "(no name given)", output "speaker" as an empty string "".
 
 Output STRICT JSON only, no markdown, no explanation, in this exact format:
-[{"speaker":"name or empty string","text":"Malayalam script text","emoji":"emoji sequence","mood":"single face emoji"}, ...]
+[{"speaker":"name or empty string","text":"Malayalam script text","mood":"single face emoji"}, ...]
 
 The array must have exactly ${parsed.length} items, in the same order as the numbered lines.`;
 
@@ -485,14 +484,10 @@ function renderComic(results){
 
     const bubble = document.createElement('div');
     bubble.className = 'comic-bubble';
-    const emojiDiv = document.createElement('div');
-    emojiDiv.className = 'comic-emoji';
-    emojiDiv.textContent = item.emoji || '';
     const textDiv = document.createElement('div');
     textDiv.className = 'comic-text';
     textDiv.textContent = item.text || '';
 
-    bubble.appendChild(emojiDiv);
     bubble.appendChild(textDiv);
 
     if(rawSpeaker){
