@@ -94,6 +94,26 @@
     position:relative; box-shadow:2px 2px 0 rgba(0,0,0,.15);
   }
   .comic-panel.right .comic-bubble{ background:#DCF8C6; }
+  .comic-panel:not(.right) .comic-bubble::before{
+    content:''; position:absolute; left:-13px; bottom:10px; width:0; height:0;
+    border-top:9px solid transparent; border-bottom:9px solid transparent;
+    border-right:13px solid #2b2b2b;
+  }
+  .comic-panel:not(.right) .comic-bubble::after{
+    content:''; position:absolute; left:-10px; bottom:11px; width:0; height:0;
+    border-top:8px solid transparent; border-bottom:8px solid transparent;
+    border-right:11px solid #fff;
+  }
+  .comic-panel.right .comic-bubble::before{
+    content:''; position:absolute; right:-13px; bottom:10px; width:0; height:0;
+    border-top:9px solid transparent; border-bottom:9px solid transparent;
+    border-left:13px solid #2b2b2b;
+  }
+  .comic-panel.right .comic-bubble::after{
+    content:''; position:absolute; right:-10px; bottom:11px; width:0; height:0;
+    border-top:8px solid transparent; border-bottom:8px solid transparent;
+    border-left:11px solid #DCF8C6;
+  }
   .comic-emoji{ font-size:26px; line-height:1.3; }
   .comic-text{ font-size:14px; color:#222; margin-top:4px; }
 </style>
@@ -406,14 +426,15 @@ async function convertComic(){
 Conversation lines:
 ${linesForPrompt}
 
-For EACH numbered line, do TWO things:
+For EACH numbered line, do THREE things:
 1. "text": Convert the message into proper Malayalam script (if it is Manglish, transliterate/translate it into natural Malayalam script; if it is already Malayalam script keep it as is; if it is genuinely English content with no Malayalam intent, keep it in English).
-2. "emoji": produce a short emoji sequence (2-5 emojis) that expresses that specific line's meaning/mood, like a comic character's expression.
+2. "emoji": produce a short emoji sequence (2-5 emojis) that expresses that specific line's meaning/mood, like a comic character's expression, to show inside the speech bubble.
+3. "mood": pick exactly ONE face/expression emoji (like 😊 😠 😢 😴 😲 😍 😅 🥳 🤔 😐 etc) that best matches the speaker's facial expression for THIS specific line. This will be used as the speaker's avatar face for this line, so vary it line by line based on the mood of that line.
 
 For "speaker": if a speaker name was given, use it exactly as given. If speaker is "(no name given)", output "speaker" as an empty string "".
 
 Output STRICT JSON only, no markdown, no explanation, in this exact format:
-[{"speaker":"name or empty string","text":"Malayalam script text","emoji":"emoji sequence"}, ...]
+[{"speaker":"name or empty string","text":"Malayalam script text","emoji":"emoji sequence","mood":"single face emoji"}, ...]
 
 The array must have exactly ${parsed.length} items, in the same order as the numbered lines.`;
 
@@ -457,7 +478,7 @@ function renderComic(results){
 
     const avatar = document.createElement('div');
     avatar.className = 'avatar';
-    avatar.textContent = speakerMap[speakerKey];
+    avatar.textContent = item.mood || speakerMap[speakerKey];
 
     const bubbleWrap = document.createElement('div');
     bubbleWrap.className = 'bubble-wrap';
