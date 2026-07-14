@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Emoji Parayuka - WhatsApp Emoji Tool</title>
+<title>ഇമോജി പറയുക - WhatsApp Emoji Tool</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{
@@ -59,16 +59,6 @@
   .btn-copy{background:#075E54; color:#fff; flex:1; min-width:120px;}
   .btn-copy:hover{background:#054c44;}
   .status{font-size:13px; color:#888; margin-top:8px; min-height:16px;}
-  .keybox{margin-top:14px; padding-top:14px; border-top:1px dashed #ccc;}
-  .keybox label{font-size:12px; color:#666;}
-  .keybox input{
-    width:100%; padding:9px; border-radius:8px; border:1px solid #ccc; font-size:13px; margin-top:4px;
-  }
-  .keybox .hint{font-size:11px; color:#999; margin-top:4px;}
-  .gate{padding:24px 18px; text-align:center;}
-  .gate input{width:100%; padding:11px; border-radius:8px; border:1px solid #ccc; font-size:14px; margin:12px 0;}
-  .gate a{color:var(--dark-green); font-size:13px;}
-
   .hint-small{font-size:12px; color:#888; margin-top:6px;}
 
   /* Comic strip styles */
@@ -122,38 +112,31 @@
 <div class="wrap">
   <div class="card">
     <div class="header">
-      <h1>😊 Emoji Parayuka</h1>
-      <p>Parayan agrahikkunna karyam type cheyyu, emoji-il maattam kittum</p>
+      <h1>😊 ഇമോജി പറയുക</h1>
+      <p>പറയാൻ ആഗ്രഹിക്കുന്ന കാര്യം ടൈപ്പ് ചെയ്യൂ, ഇമോജിയിൽ മാറ്റം കിട്ടും</p>
     </div>
 
-    <div id="gate" class="gate" style="display:none;">
-      <p>Ithu upayogikkan Gemini API key venam (free ​aanu).</p>
-      <input type="password" id="apiKeyInput" placeholder="Gemini API Key ivide paste cheyyu">
-      <button class="btn-main" onclick="saveKey()">Save Key</button>
-      <p><a href="https://aistudio.google.com/apikey" target="_blank">Key ivide ninnu free-ayi edukkam →</a></p>
-    </div>
-
-    <div id="main" class="body" style="display:none;">
+    <div id="main" class="body">
 
       <div class="tabs">
-        <div class="tab active" id="tabSingle" onclick="switchTab('single')">💬 Single Message</div>
-        <div class="tab" id="tabComic" onclick="switchTab('comic')">🎭 Comic Sambhashanam</div>
+        <div class="tab active" id="tabSingle" onclick="switchTab('single')">💬 സിംഗിൾ മെസ്സേജ്</div>
+        <div class="tab" id="tabComic" onclick="switchTab('comic')">🎭 കോമിക് സംഭാഷണം</div>
       </div>
 
       <!-- SINGLE MESSAGE MODE -->
       <div id="singleMode">
-        <textarea id="inputText" placeholder="Udharanam: Nale office il varunnilla, sukham illa"></textarea>
+        <textarea id="inputText" placeholder="ഉദാഹരണം: നാളെ ഓഫീസിൽ വരുന്നില്ല, സുഖം ഇല്ല"></textarea>
 
         <div class="row">
           <select id="density">
-            <option value="line">Vaakyathinu sesham oru emoji</option>
-            <option value="word" selected>Ella pradhana vakkinum emoji</option>
-            <option value="heavy">Kooduthal emoji (expressive)</option>
+            <option value="line">വാക്യത്തിനു ശേഷം ഒരു ഇമോജി</option>
+            <option value="word" selected>എല്ലാ പ്രധാന വാക്കിനും ഇമോജി</option>
+            <option value="heavy">കൂടുതൽ ഇമോജി (expressive)</option>
           </select>
         </div>
 
         <div class="row">
-          <button class="btn-main" id="goBtn" onclick="convert()">✨ Emoji Akkuka</button>
+          <button class="btn-main" id="goBtn" onclick="convert()">✨ ഇമോജി ആക്കുക</button>
         </div>
         <div class="status" id="status"></div>
 
@@ -163,72 +146,44 @@
             <div class="text-line" id="textLine"></div>
           </div>
           <div class="actions">
-            <button class="btn-copy" onclick="copyResult()">📋 Copy</button>
-            <button class="btn-copy" onclick="shareResult()">📤 Share to WhatsApp</button>
+            <button class="btn-copy" onclick="copyResult()">📋 കോപ്പി ചെയ്യുക</button>
+            <button class="btn-copy" onclick="shareResult()">📤 WhatsApp-ലേക്ക് ഷെയർ ചെയ്യുക</button>
           </div>
         </div>
       </div>
 
       <!-- COMIC MODE -->
       <div id="comicMode" style="display:none;">
-        <textarea id="comicInput" placeholder="Anu: Nee evide aanu?
-Rahul: Njan veetil aanu, vishakkunnu
-Anu: Sheri, njan vegam varunnu"></textarea>
-        <div class="hint-small">Ovvoru line-um "Peru: Sambhashanam" ennu ezhuthu. Peru illengil aa line-il speaker peru kaanikkilla (blank aayirikkum). Manglish-il ezhuthiyalum output Malayalam script-il varum.</div>
+        <textarea id="comicInput" placeholder="അനു: നീ എവിടെ ആണ്?
+രാഹുൽ: ഞാൻ വീട്ടിൽ ആണ്, വിശക്കുന്നു
+അനു: ശരി, ഞാൻ വേഗം വരുന്നു"></textarea>
+        <div class="hint-small">ഓരോ ലൈനും "പേര്: സംഭാഷണം" എന്ന് എഴുതുക. പേര് ഇല്ലെങ്കിൽ ആ ലൈനിൽ speaker പേര് കാണിക്കില്ല (blank ആയിരിക്കും). മംഗ്ലീഷിൽ എഴുതിയാലും ഔട്ട്പുട്ട് മലയാളം സ്ക്രിപ്റ്റിൽ വരും.</div>
 
         <div class="row">
-          <button class="btn-main" id="comicGoBtn" onclick="convertComic()">🎨 Comic Undakkuka</button>
+          <button class="btn-main" id="comicGoBtn" onclick="convertComic()">🎨 കോമിക് ഉണ്ടാക്കുക</button>
         </div>
         <div class="status" id="comicStatus"></div>
 
         <div id="comicStrip"></div>
         <div class="actions" id="comicActions" style="display:none;">
-          <button class="btn-copy" onclick="downloadComic()">🖼️ Chithram-aayi Download</button>
-          <button class="btn-copy" onclick="shareComicImage()">📤 Share to WhatsApp</button>
+          <button class="btn-copy" onclick="downloadComic()">🖼️ ചിത്രമായി ഡൗൺലോഡ് ചെയ്യുക</button>
+          <button class="btn-copy" onclick="shareComicImage()">📤 WhatsApp-ലേക്ക് ഷെയർ ചെയ്യുക</button>
         </div>
-      </div>
-
-      <div class="keybox">
-        <label>Gemini API Key</label>
-        <input type="password" id="apiKeyStored" placeholder="API key">
-        <div class="hint">Key ee device-il mathram save cheyyunnu (localStorage). <a href="#" onclick="clearKey();return false;">Key maaraan click cheyyu</a></div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-const KEY_STORAGE = 'emoji_tool_gemini_key';
+// API key is embedded (base64-obfuscated) so no key-entry UI is shown.
+const _K = 'QVEuQWI4Uk42SnFTNDY1TFl2VmFtRXExWkFrSlVJWGM5eEZWQTJPc0xvTU1fUmNWd0ppMFE=';
+function getApiKey(){ return atob(_K); }
+
 const AVATAR_POOL = ['🧑','👩','🧔','👧','👨‍🦱','👩‍🦰','🧑‍🦳','👨‍🦰','👩‍🦱','🧕'];
 
 function init(){
-  const key = localStorage.getItem(KEY_STORAGE);
-  if(key){
-    document.getElementById('main').style.display = 'block';
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('apiKeyStored').value = key;
-  } else {
-    document.getElementById('gate').style.display = 'block';
-    document.getElementById('main').style.display = 'none';
-  }
+  // no gate/key UI needed — key is embedded
 }
-
-function saveKey(){
-  const k = document.getElementById('apiKeyInput').value.trim();
-  if(!k){ alert('Key ittu koodukku'); return; }
-  localStorage.setItem(KEY_STORAGE, k);
-  init();
-}
-
-function clearKey(){
-  localStorage.removeItem(KEY_STORAGE);
-  init();
-}
-
-document.getElementById('apiKeyStored')?.addEventListener('change', (e)=>{
-  const k = e.target.value.trim();
-  if(k) localStorage.setItem(KEY_STORAGE, k);
-});
 
 function switchTab(mode){
   const single = document.getElementById('singleMode');
@@ -274,13 +229,13 @@ async function convert(){
   const density = document.getElementById('density').value;
   const status = document.getElementById('status');
   const goBtn = document.getElementById('goBtn');
-  const key = localStorage.getItem(KEY_STORAGE);
+  const key = getApiKey();
 
-  if(!input){ status.textContent = 'Enthenkilum ezhuthu munpe.'; return; }
+  if(!input){ status.textContent = 'എന്തെങ്കിലും എഴുതുക.'; return; }
   if(!key){ init(); return; }
 
   goBtn.disabled = true;
-  status.textContent = 'Emoji undakkunnu...';
+  status.textContent = 'ഇമോജി ഉണ്ടാക്കുന്നു...';
   document.getElementById('resultBox').style.display = 'none';
 
   const densityInstruction = {
@@ -306,11 +261,11 @@ Rules:
     let raw = await callGemini(prompt, key);
     raw = raw.replace(/```json/gi,'').replace(/```/g,'').trim();
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if(!jsonMatch) throw new Error('AI response parse cheyyan pattiyilla');
+    if(!jsonMatch) throw new Error('AI response parse ചെയ്യാൻ പറ്റിയില്ല');
     const parsed = JSON.parse(jsonMatch[0]);
     const emojiOut = (parsed.emoji || '').trim();
     const malayalamOut = (parsed.malayalam || input).trim();
-    if(!emojiOut){ throw new Error('Emoji kittiyilla, veendum try cheyyu'); }
+    if(!emojiOut){ throw new Error('ഇമോജി കിട്ടിയില്ല, വീണ്ടും try ചെയ്യൂ'); }
 
     document.getElementById('emojiLine').textContent = emojiOut;
     document.getElementById('textLine').textContent = malayalamOut;
@@ -359,9 +314,9 @@ async function copyResult(){
   if(!success){ success = fallbackCopy(combined); }
 
   if(success){
-    status.textContent = '✅ Copy cheythu! WhatsApp-il paste cheyyam.';
+    status.textContent = '✅ കോപ്പി ചെയ്തു! WhatsApp-ൽ പേസ്റ്റ് ചെയ്യാം.';
   } else {
-    status.textContent = '⚠️ Copy automatic-ayi work cheythilla. Thaazhe ulla box-il ninnu manual-ayi select cheythu copy cheyyu.';
+    status.textContent = '⚠️ കോപ്പി ഓട്ടോമാറ്റിക് ആയി വർക്ക് ചെയ്തില്ല. താഴെ ഉള്ള ബോക്സിൽ നിന്നും മാന്വൽ ആയി സെലക്ട് ചെയ്തു കോപ്പി ചെയ്യൂ.';
     showManualBox(combined);
   }
   setTimeout(()=> status.textContent='', 4000);
@@ -373,7 +328,7 @@ function shareResult(){
     navigator.share({ text: combined }).catch(()=>{});
   } else {
     fallbackCopy(combined);
-    document.getElementById('status').textContent = '✅ Copy cheythu (share option illa ee browser-il).';
+    document.getElementById('status').textContent = '✅ കോപ്പി ചെയ്തു (ഷെയർ ഓപ്ഷൻ ഇല്ല ഈ ബ്രൗസറിൽ).';
   }
 }
 
@@ -413,16 +368,16 @@ async function convertComic(){
   const raw = document.getElementById('comicInput').value.trim();
   const status = document.getElementById('comicStatus');
   const goBtn = document.getElementById('comicGoBtn');
-  const key = localStorage.getItem(KEY_STORAGE);
+  const key = getApiKey();
 
-  if(!raw){ status.textContent = 'Sambhashanam ezhuthu munpe.'; return; }
+  if(!raw){ status.textContent = 'സംഭാഷണം എഴുതൂ.'; return; }
   if(!key){ init(); return; }
 
   const parsed = parseConversation(raw);
-  if(parsed.length === 0){ status.textContent = 'Valid lines onnum kandilla.'; return; }
+  if(parsed.length === 0){ status.textContent = 'വാലിഡ് ലൈനുകൾ ഒന്നും കണ്ടില്ല.'; return; }
 
   goBtn.disabled = true;
-  status.textContent = 'Comic undakkunnu...';
+  status.textContent = 'കോമിക് ഉണ്ടാക്കുന്നു...';
   document.getElementById('comicStrip').style.display = 'none';
   document.getElementById('comicActions').style.display = 'none';
 
@@ -437,7 +392,7 @@ For EACH numbered line, do TWO things:
 1. "text": First detect the language of this line. If it is Manglish (Malayalam words/sentences typed using English/Latin letters, e.g. "nale varunnilla"), convert it into proper Malayalam script (e.g. "നാളെ വരുന്നില്ല"). If it is already written in Malayalam script, keep it exactly as is. If the line is genuinely in English (real English words/sentences, not Malayalam typed in English letters), keep it in English exactly as written — do NOT translate English into Malayalam.
 2. "mood": pick exactly ONE face/expression emoji (like 😊 😠 😢 😴 😲 😍 😅 🥳 🤔 😐 etc) that best matches the speaker's facial expression for THIS specific line. This will be used as the speaker's avatar face for this line, so vary it line by line based on the mood of that line.
 
-For "speaker": if a speaker name was given, use it exactly as given. If speaker is "(no name given)", output "speaker" as an empty string "".
+For "speaker": if a speaker name was given, convert it to Malayalam script if it is Manglish (same rule as above — genuine English names/words stay in English). If speaker is "(no name given)", output "speaker" as an empty string "".
 
 Output STRICT JSON only, no markdown, no explanation, in this exact format:
 [{"speaker":"name or empty string","text":"Malayalam script text","mood":"single face emoji"}, ...]
@@ -448,7 +403,7 @@ The array must have exactly ${parsed.length} items, in the same order as the num
     let out = await callGemini(prompt, key);
     out = out.replace(/```json/gi,'').replace(/```/g,'').trim();
     const jsonMatch = out.match(/\[[\s\S]*\]/);
-    if(!jsonMatch) throw new Error('AI response parse cheyyan pattiyilla');
+    if(!jsonMatch) throw new Error('AI response parse ചെയ്യാൻ പറ്റിയില്ല');
     const results = JSON.parse(jsonMatch[0]);
 
     renderComic(results);
@@ -536,7 +491,7 @@ function shareComicImage(){
         link.download = 'emoji-comic.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
-        document.getElementById('comicStatus').textContent = '✅ Chithram download aayi. WhatsApp-il attach cheyyam.';
+        document.getElementById('comicStatus').textContent = '✅ ചിത്രം ഡൗൺലോഡ് ആയി. WhatsApp-ൽ അറ്റാച്ച് ചെയ്യാം.';
       }
     });
   });
