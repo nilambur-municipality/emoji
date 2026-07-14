@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ഇമോജി പറയുക - WhatsApp Emoji Tool</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --green:#25D366; --dark-green:#128C7E; --bg:#ECE5DD; --panel:#fff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI', Arial, sans-serif; background:var(--bg);
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px;
+  }
+  .wrap{width:100%; max-width:560px;}
+  .card{
+    background:var(--panel); border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,.15);
+    overflow:hidden;
+  }
+  .header{
+    background:var(--dark-green); color:#fff; padding:16px 20px; text-align:center;
+  }
+  .header h1{margin:0; font-size:20px;}
+  .header p{margin:4px 0 0; font-size:13px; opacity:.85;}
+  .body{padding:18px;}
+
+  .tabs{display:flex; gap:8px; margin-bottom:14px;}
+  .tab{
+    flex:1; text-align:center; padding:10px; border-radius:10px; cursor:pointer;
+    background:#f0f0f0; font-size:14px; font-weight:600; color:#555;
+  }
+  .tab.active{background:var(--green); color:#fff;}
+
+  textarea{
+    width:100%; min-height:90px; border:1px solid #ccc; border-radius:10px; padding:12px;
+    font-size:15px; resize:vertical; font-family:inherit;
+  }
+  .row{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
+  select{
+    flex:1; padding:10px; border-radius:10px; border:1px solid #ccc; font-size:14px;
+  }
+  button{
+    cursor:pointer; border:none; border-radius:10px; padding:12px 18px; font-size:15px;
+    font-weight:600; transition:.15s;
+  }
+  .btn-main{background:var(--green); color:#fff; flex:1;}
+  .btn-main:hover{background:var(--dark-green);}
+  .btn-main:disabled{background:#aaa; cursor:not-allowed;}
+  .result{margin-top:16px; display:none;}
+  .msg-bubble{
+    background:#DCF8C6; border-radius:12px; padding:14px 16px; position:relative;
+    box-shadow:0 1px 2px rgba(0,0,0,.1);
+  }
+  .emoji-line{font-size:30px; line-height:1.4; word-break:break-word; margin-bottom:8px;}
+  .text-line{font-size:15px; color:#222; line-height:1.4;}
+  .actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+  .btn-copy{background:#075E54; color:#fff; flex:1; min-width:120px;}
+  .btn-copy:hover{background:#054c44;}
+  .status{font-size:13px; color:#888; margin-top:8px; min-height:16px;}
+  .hint-small{font-size:12px; color:#888; margin-top:6px;}
+
+  /* Comic strip styles */
+  #comicStrip{
+    background:#FFF8E7; border:3px solid #2b2b2b; border-radius:14px; padding:16px;
+    margin-top:16px; display:none;
+  }
+  .comic-panel{
+    display:flex; align-items:flex-end; margin-bottom:16px; gap:10px;
+  }
+  .comic-panel.right{ flex-direction:row-reverse; }
+  .avatar{
+    width:54px; height:54px; border-radius:50%; background:#fff; border:2px solid #2b2b2b;
+    display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0;
+  }
+  .bubble-wrap{ max-width:75%; }
+  .speaker-name{
+    font-size:11px; font-weight:700; color:#555; margin-bottom:3px; padding-left:4px;
+  }
+  .comic-panel.right .speaker-name{ text-align:right; padding-right:4px; }
+  .comic-bubble{
+    background:#fff; border:2.5px solid #2b2b2b; border-radius:16px; padding:10px 14px;
+    position:relative; box-shadow:2px 2px 0 rgba(0,0,0,.15);
+  }
+  .comic-panel.right .comic-bubble{ background:#DCF8C6; }
+  .comic-panel:not(.right) .comic-bubble::before{
+    content:''; position:absolute; left:-13px; bottom:10px; width:0; height:0;
+    border-top:9px solid transparent; border-bottom:9px solid transparent;
+    border-right:13px solid #2b2b2b;
+  }
+  .comic-panel:not(.right) .comic-bubble::after{
+    content:''; position:absolute; left:-10px; bottom:11px; width:0; height:0;
+    border-top:8px solid transparent; border-bottom:8px solid transparent;
+    border-right:11px solid #fff;
+  }
+  .comic-panel.right .comic-bubble::before{
+    content:''; position:absolute; right:-13px; bottom:10px; width:0; height:0;
+    border-top:9px solid transparent; border-bottom:9px solid transparent;
+    border-left:13px solid #2b2b2b;
+  }
+  .comic-panel.right .comic-bubble::after{
+    content:''; position:absolute; right:-10px; bottom:11px; width:0; height:0;
+    border-top:8px solid transparent; border-bottom:8px solid transparent;
+    border-left:11px solid #DCF8C6;
+  }
+  .comic-emoji{ font-size:26px; line-height:1.3; }
+  .comic-text{ font-size:14px; color:#222; margin-top:4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="header">
+      <h1>😊 ഇമോജി പറയുക</h1>
+      <p>പറയാൻ ആഗ്രഹിക്കുന്ന കാര്യം ടൈപ്പ് ചെയ്യൂ, ഇമോജിയിൽ മാറ്റം കിട്ടും</p>
+    </div>
+
+    <div id="main" class="body">
+
+      <div class="tabs">
+        <div class="tab active" id="tabSingle" onclick="switchTab('single')">💬 സിംഗിൾ മെസ്സേജ്</div>
+        <div class="tab" id="tabComic" onclick="switchTab('comic')">🎭 കോമിക് സംഭാഷണം</div>
+      </div>
+
+      <!-- SINGLE MESSAGE MODE -->
+      <div id="singleMode">
+        <textarea id="inputText" placeholder="ഉദാഹരണം: നാളെ ഓഫീസിൽ വരുന്നില്ല, സുഖം ഇല്ല"></textarea>
+
+        <div class="row">
+          <select id="density">
+            <option value="line">വാക്യത്തിനു ശേഷം ഒരു ഇമോജി</option>
+            <option value="word" selected>എല്ലാ പ്രധാന വാക്കിനും ഇമോജി</option>
+            <option value="heavy">കൂടുതൽ ഇമോജി (expressive)</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <button class="btn-main" id="goBtn" onclick="convert()">✨ ഇമോജി ആക്കുക</button>
+        </div>
+        <div class="status" id="status"></div>
+
+        <div class="result" id="resultBox">
+          <div class="msg-bubble">
+            <div class="emoji-line" id="emojiLine"></div>
+            <div class="text-line" id="textLine"></div>
+          </div>
+          <div class="actions">
+            <button class="btn-copy" onclick="copyResult()">📋 കോപ്പി ചെയ്യുക</button>
+            <button class="btn-copy" onclick="shareResult()">📤 WhatsApp-ലേക്ക് ഷെയർ ചെയ്യുക</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMIC MODE -->
+      <div id="comicMode" style="display:none;">
+        <textarea id="comicInput" placeholder="അനു: നീ എവിടെ ആണ്?
+രാഹുൽ: ഞാൻ വീട്ടിൽ ആണ്, വിശക്കുന്നു
+അനു: ശരി, ഞാൻ വേഗം വരുന്നു"></textarea>
+        <div class="hint-small">ഓരോ ലൈനും "പേര്: സംഭാഷണം" എന്ന് എഴുതുക. പേര് ഇല്ലെങ്കിൽ ആ ലൈനിൽ speaker പേര് കാണിക്കില്ല (blank ആയിരിക്കും). മംഗ്ലീഷിൽ എഴുതിയാലും ഔട്ട്പുട്ട് മലയാളം സ്ക്രിപ്റ്റിൽ വരും.</div>
+
+        <div class="row">
+          <button class="btn-main" id="comicGoBtn" onclick="convertComic()">🎨 കോമിക് ഉണ്ടാക്കുക</button>
+        </div>
+        <div class="status" id="comicStatus"></div>
+
+        <div id="comicStrip"></div>
+        <div class="actions" id="comicActions" style="display:none;">
+          <button class="btn-copy" onclick="downloadComic()">🖼️ ചിത്രമായി ഡൗൺലോഡ് ചെയ്യുക</button>
+          <button class="btn-copy" onclick="shareComicImage()">📤 WhatsApp-ലേക്ക് ഷെയർ ചെയ്യുക</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// API key is embedded (base64-obfuscated) so no key-entry UI is shown.
+const _K = 'QVEuQWI4Uk42SnFTNDY1TFl2VmFtRXExWkFrSlVJWGM5eEZWQTJPc0xvTU1fUmNWd0ppMFE=';
+function getApiKey(){ return atob(_K); }
+
+const AVATAR_POOL = ['🧑','👩','🧔','👧','👨‍🦱','👩‍🦰','🧑‍🦳','👨‍🦰','👩‍🦱','🧕'];
+
+function init(){
+  // no gate/key UI needed — key is embedded
+}
+
+function switchTab(mode){
+  const single = document.getElementById('singleMode');
+  const comic = document.getElementById('comicMode');
+  const tabSingle = document.getElementById('tabSingle');
+  const tabComic = document.getElementById('tabComic');
+  if(mode === 'single'){
+    single.style.display = 'block';
+    comic.style.display = 'none';
+    tabSingle.classList.add('active');
+    tabComic.classList.remove('active');
+  } else {
+    single.style.display = 'none';
+    comic.style.display = 'block';
+    tabSingle.classList.remove('active');
+    tabComic.classList.add('active');
+  }
+}
+
+async function callGemini(prompt, key, attempt = 1){
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${encodeURIComponent(key)}`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      contents:[{ parts:[{ text: prompt }] }],
+      generationConfig: { thinkingConfig: { thinkingLevel: 'minimal' } }
+    })
+  });
+  if(!res.ok){
+    if(res.status === 503 && attempt < 3){
+      await new Promise(r => setTimeout(r, attempt * 1200));
+      return callGemini(prompt, key, attempt + 1);
+    }
+    const errText = await res.text();
+    throw new Error('API error: ' + res.status + ' ' + errText.slice(0,200));
+  }
+  const data = await res.json();
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+}
+
+async function convert(){
+  const input = document.getElementById('inputText').value.trim();
+  const density = document.getElementById('density').value;
+  const status = document.getElementById('status');
+  const goBtn = document.getElementById('goBtn');
+  const key = getApiKey();
+
+  if(!input){ status.textContent = 'എന്തെങ്കിലും എഴുതുക.'; return; }
+  if(!key){ init(); return; }
+
+  goBtn.disabled = true;
+  status.textContent = 'ചിന്തിക്കുന്നു... മികച്ച ഇമോജികൾ കണ്ടെത്തുന്നു...';
+  document.getElementById('resultBox').style.display = 'none';
+
+  const densityInstruction = {
+    line: 'Give only ONE short sequence of 2-4 emojis that captures the overall true intent, logic, and mood.',
+    word: 'Intelligently map emojis to key concepts in the sentence contextually without cluttering.',
+    heavy: 'Provide a highly expressive, modern, and rich emoji representation.'
+  }[density];
+
+  // നിലവിലെ തീയതിയും സമയവും
+  const now = new Date();
+  const timeContext = now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+  const prompt = `You are a highly advanced, culturally aware AI assistant specialized in WhatsApp communication.
+
+CURRENT SYSTEM CONTEXT:
+- Real-time Date & Time: ${timeContext}
+- Cultural Setting: Kerala, India (Malayalam speaker).
+
+ADVANCED LOGIC & COMMON SENSE (MANDATORY):
+1. Deep Comprehension: Do not translate literally. Understand sarcasm, humor, urgency, idioms, local slangs, and implied meanings (Apply strong common sense).
+2. Temporal & Spatial Awareness: If the user mentions times (morning/night), days ("nale", "innu"), or weather, use the Current System Context to logically predict and use accurate emojis (e.g., correct moon phases, clocks, or exact calendar dates).
+3. Cultural Nuance: Use emojis that naturally fit the Malayali vibe (e.g., food, festivals, everyday situations).
+4. Smart Adaptability: Always apply upgraded, modern reasoning. If a user says "I am flying", understand if it's literal (✈️) or metaphorical (✨🚀) based on the rest of the sentence.
+
+User Message: "${input}"
+
+Do TWO things:
+1. "malayalam": Detect the language. If Manglish, convert to perfect, natural Malayalam script. If genuinely English or already Malayalam, keep it as is.
+2. "emoji": ${densityInstruction}
+
+Output STRICT JSON only, no markdown, no explanation, in this exact format: {"malayalam":"...", "emoji":"..."}`;
+
+  try{
+    let raw = await callGemini(prompt, key);
+    raw = raw.replace(/```json/gi,'').replace(/```/g,'').trim();
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('AI response parse ചെയ്യാൻ പറ്റിയില്ല');
+    const parsed = JSON.parse(jsonMatch[0]);
+    const emojiOut = (parsed.emoji || '').trim();
+    const malayalamOut = (parsed.malayalam || input).trim();
+    if(!emojiOut){ throw new Error('ഇമോജി കിട്ടിയില്ല, വീണ്ടും try ചെയ്യൂ'); }
+
+    document.getElementById('emojiLine').textContent = emojiOut;
+    document.getElementById('textLine').textContent = malayalamOut;
+    document.getElementById('resultBox').style.display = 'block';
+    status.textContent = '';
+  } catch(err){
+    status.textContent = '❌ ' + err.message;
+  } finally {
+    goBtn.disabled = false;
+  }
+}
+
+function getCombinedText(){
+  const emoji = document.getElementById('emojiLine').textContent;
+  const text = document.getElementById('textLine').textContent;
+  return `${emoji}\n${text}`;
+}
+
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  ta.style.top = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try{ ok = document.execCommand('copy'); }catch(e){ ok = false; }
+  document.body.removeChild(ta);
+  return ok;
+}
+
+async function copyResult(){
+  const status = document.getElementById('status');
+  const combined = getCombinedText();
+  let success = false;
+
+  if(navigator.clipboard && window.isSecureContext){
+    try{
+      await navigator.clipboard.writeText(combined);
+      success = true;
+    }catch(e){ success = false; }
+  }
+  if(!success){ success = fallbackCopy(combined); }
+
+  if(success){
+    status.textContent = '✅ കോപ്പി ചെയ്തു! WhatsApp-ൽ പേസ്റ്റ് ചെയ്യാം.';
+  } else {
+    status.textContent = '⚠️ കോപ്പി ഓട്ടോമാറ്റിക് ആയി വർക്ക് ചെയ്തില്ല. താഴെ ഉള്ള ബോക്സിൽ നിന്നും മാന്വൽ ആയി സെലക്ട് ചെയ്തു കോപ്പി ചെയ്യൂ.';
+    showManualBox(combined);
+  }
+  setTimeout(()=> status.textContent='', 4000);
+}
+
+function shareResult(){
+  const combined = getCombinedText();
+  if(navigator.share){
+    navigator.share({ text: combined }).catch(()=>{});
+  } else {
+    fallbackCopy(combined);
+    document.getElementById('status').textContent = '✅ കോപ്പി ചെയ്തു (ഷെയർ ഓപ്ഷൻ ഇല്ല ഈ ബ്രൗസറിൽ).';
+  }
+}
+
+function showManualBox(text){
+  let box = document.getElementById('manualBox');
+  if(!box){
+    box = document.createElement('textarea');
+    box.id = 'manualBox';
+    box.style.width = '100%';
+    box.style.marginTop = '10px';
+    box.style.padding = '10px';
+    box.style.borderRadius = '8px';
+    box.style.border = '1px solid #ccc';
+    box.style.fontSize = '15px';
+    document.getElementById('resultBox').appendChild(box);
+  }
+  box.value = text;
+  box.style.display = 'block';
+  box.focus();
+  box.select();
+}
+
+/* ---------- COMIC MODE ---------- */
+
+function parseConversation(raw){
+  const lines = raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  return lines.map(line=>{
+    const m = line.match(/^([^:：]{1,20}):\s*(.+)$/);
+    if(m){
+      return { speaker: m[1].trim(), text: m[2].trim() };
+    }
+    return { speaker: '', text: line };
+  });
+}
+
+async function convertComic(){
+  const raw = document.getElementById('comicInput').value.trim();
+  const status = document.getElementById('comicStatus');
+  const goBtn = document.getElementById('comicGoBtn');
+  const key = getApiKey();
+
+  if(!raw){ status.textContent = 'സംഭാഷണം എഴുതൂ.'; return; }
+  if(!key){ init(); return; }
+
+  const parsed = parseConversation(raw);
+  if(parsed.length === 0){ status.textContent = 'വാലിഡ് ലൈനുകൾ ഒന്നും കണ്ടില്ല.'; return; }
+
+  goBtn.disabled = true;
+  status.textContent = 'കോമിക് ചിന്തിച്ചുണ്ടാക്കുന്നു...';
+  document.getElementById('comicStrip').style.display = 'none';
+  document.getElementById('comicActions').style.display = 'none';
+
+  const linesForPrompt = parsed.map((p,i)=>`${i+1}. [speaker: ${p.speaker || '(no name given)'}] ${p.text}`).join('\n');
+  
+  // നിലവിലെ തീയതിയും സമയവും കോമിക് മോഡിനും
+  const now = new Date();
+  const timeContext = now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+  const prompt = `You are a highly advanced, culturally aware AI assistant converting a comic-style conversation into emoji speech-bubble form. Lines may be written in Malayalam script, Manglish, or English.
+
+CURRENT SYSTEM CONTEXT:
+- Real-time Date & Time: ${timeContext}
+- Cultural Setting: Kerala, India (Malayalam speaker).
+
+ADVANCED LOGIC & COMMON SENSE:
+1. Deep Comprehension: Understand sarcasm, humor, urgency, and implied meanings.
+2. Contextual Emojis: Use the Current System Context to mentally frame the conversation logically.
+3. Emotion & Mood: Pick exactly ONE face/expression emoji for the "mood" that perfectly matches the speaker's exact tone and context for that specific line.
+
+Conversation lines:
+${linesForPrompt}
+
+For EACH numbered line, do TWO things:
+1. "text": First detect the language. If Manglish, convert into proper Malayalam script. If genuinely English or already Malayalam, keep it as is.
+2. "mood": pick exactly ONE face/expression emoji (like 😊 😠 😢 😴 😲 😍 😅 🥳 🤔 😐 etc) that best matches the speaker's facial expression for THIS specific line.
+
+For "speaker": convert to Malayalam script if it is Manglish. If "(no name given)", output "speaker" as an empty string "".
+
+Output STRICT JSON only, no markdown, no explanation, in this exact format:
+[{"speaker":"name or empty string","text":"Malayalam script text","mood":"single face emoji"}, ...]
+
+The array must have exactly ${parsed.length} items, in the same order as the numbered lines.`;
+
+  try{
+    let out = await callGemini(prompt, key);
+    out = out.replace(/```json/gi,'').replace(/```/g,'').trim();
+    const jsonMatch = out.match(/\[[\s\S]*\]/);
+    if(!jsonMatch) throw new Error('AI response parse ചെയ്യാൻ പറ്റിയില്ല');
+    const results = JSON.parse(jsonMatch[0]);
+
+    renderComic(results);
+    status.textContent = '';
+  } catch(err){
+    status.textContent = '❌ ' + err.message;
+  } finally {
+    goBtn.disabled = false;
+  }
+}
+
+function renderComic(results){
+  const strip = document.getElementById('comicStrip');
+  strip.innerHTML = '';
+  const speakerMap = {};
+  let speakerCount = 0;
+  let mainSpeakerKey = null;
+  const SELF_KEY = '__self__';
+
+  results.forEach((item, idx)=>{
+    const rawSpeaker = (item.speaker || '').trim();
+    const speakerKey = rawSpeaker || SELF_KEY;
+
+    if(!(speakerKey in speakerMap)){
+      speakerMap[speakerKey] = AVATAR_POOL[speakerCount % AVATAR_POOL.length];
+      if(mainSpeakerKey === null) mainSpeakerKey = speakerKey;
+      speakerCount++;
+    }
+    const isRight = speakerKey === mainSpeakerKey;
+
+    const panel = document.createElement('div');
+    panel.className = 'comic-panel' + (isRight ? ' right' : '');
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = item.mood || speakerMap[speakerKey];
+
+    const bubbleWrap = document.createElement('div');
+    bubbleWrap.className = 'bubble-wrap';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'comic-bubble';
+    const textDiv = document.createElement('div');
+    textDiv.className = 'comic-text';
+    textDiv.textContent = item.text || '';
+
+    bubble.appendChild(textDiv);
+
+    if(rawSpeaker){
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'speaker-name';
+      nameDiv.textContent = rawSpeaker;
+      bubbleWrap.appendChild(nameDiv);
+    }
+    bubbleWrap.appendChild(bubble);
+
+    panel.appendChild(avatar);
+    panel.appendChild(bubbleWrap);
+    strip.appendChild(panel);
+  });
+
+  strip.style.display = 'block';
+  document.getElementById('comicActions').style.display = 'flex';
+}
+
+function downloadComic(){
+  const strip = document.getElementById('comicStrip');
+  html2canvas(strip, {backgroundColor:'#FFF8E7', scale:2}).then(canvas=>{
+    const link = document.createElement('a');
+    link.download = 'emoji-comic.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+
+function shareComicImage(){
+  const strip = document.getElementById('comicStrip');
+  html2canvas(strip, {backgroundColor:'#FFF8E7', scale:2}).then(canvas=>{
+    canvas.toBlob(blob=>{
+      const file = new File([blob], 'emoji-comic.png', {type:'image/png'});
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({ files:[file] }).catch(()=>{});
+      } else {
+        const link = document.createElement('a');
+        link.download = 'emoji-comic.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        document.getElementById('comicStatus').textContent = '✅ ചിത്രം ഡൗൺലോഡ് ആയി. WhatsApp-ൽ അറ്റാച്ച് ചെയ്യാം.';
+      }
+    });
+  });
+}
+
+init();
+</script>
+</body>
+</html>
+
